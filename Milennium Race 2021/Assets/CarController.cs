@@ -17,14 +17,18 @@ public class CarController : MonoBehaviour
     public GameObject[] steeringWheels;
 
     private float carAcceleration = 0f;
-    private float accelerationVelocity = 0.0f;
+    //private float accelerationVelocity = 0.0f;
     private float carSteering = 0f;
     private float steeringVelocity = 0.0f;
 
+    public float nitro = 10.0f;
+
+    private bool drifting = false;
     private bool braking = false;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.centerOfMass = new Vector2(0, +0.2f);
     }
 
     void AddForceAtPosition(Vector3 force, Vector3 pos)
@@ -43,29 +47,35 @@ public class CarController : MonoBehaviour
         }
 
         var v = Input.GetAxis("Vertical");
-        if (v == 0f || Mathf.Sign(carAcceleration) != Mathf.Sign(v))
+        carAcceleration = v * maxAcceleration ;
+
+        if (Input.GetKey(KeyCode.LeftShift) && nitro > 0f)
         {
-            carAcceleration = 0f;
+            carAcceleration *= 1.5f;
+            nitro -= Time.deltaTime;
         }
-        if (v > 0f && carAcceleration < maxAcceleration || v < 0f && carAcceleration > -maxAcceleration)
-        {
-            carAcceleration = Mathf.SmoothDamp(carAcceleration, Mathf.Sign(v) * maxAcceleration, ref accelerationVelocity, accelerationTime);
-        }
-        //print(carAcceleration);
+
         var h = -Input.GetAxis("Horizontal");
         carSteering = Mathf.SmoothDamp(carSteering, h * maxSteering, ref steeringVelocity, steeringTime);
 
         if (Input.GetKey(KeyCode.Space))
         {
+            rb.centerOfMass = new Vector2(0, -0.1f);
+            drifting = true;
             braking = true;
-            carAcceleration = 0f;
         }
-        else
+        else if (Mathf.Abs(Vector3.Angle(rb.velocity, transform.up)) < 10)
         {
+            rb.centerOfMass = new Vector2(0, +0.2f);
             braking = false;
+            drifting = false;
+        }
+        else 
+        {
+            braking = false; 
         }
 
-        if (Mathf.Abs(Vector3.Angle(rb.velocity, transform.up)) > 10 || braking)
+        if (Mathf.Abs(Vector3.Angle(rb.velocity, transform.up)) > 10 || drifting)
         {
             foreach (var wheel in driveWheels)
             {
@@ -85,7 +95,7 @@ public class CarController : MonoBehaviour
     void addFriction(GameObject wheel, Vector3 dir, float coefficient = 1.0f)
     {
         var velocity = rb.GetPointVelocity(wheel.transform.position);
-        var friction = -frictionCefficient * Vector2.Dot(velocity, dir) * dir.normalized * coefficient;
+        var friction = -frictionCefficient * rb.mass * Vector2.Dot(velocity, dir) * dir.normalized * coefficient;
         AddForceAtPosition(friction, wheel.transform.position);
     }
 

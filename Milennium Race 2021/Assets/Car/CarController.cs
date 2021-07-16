@@ -7,6 +7,8 @@ public class CarController : MonoBehaviour
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
+    public NitroBar nitroBar;
+
     [SerializeField] private float maxAcceleration = 4;
     [SerializeField] [Range(0, 55f)]  private float maxSteering = 35;
     [SerializeField] private float steeringTime = 35;
@@ -65,17 +67,11 @@ public class CarController : MonoBehaviour
 
     void Update()
     {
-
-        //DEBUG
-        if (Input.GetKey(KeyCode.R))
-        {
-            transform.position = new Vector3(0, 0, 0);
-        }
-
         if (Input.GetKey(KeyCode.LeftShift) && curNitro > 0f)
         {
             isNitro = true;
             curNitro -= Time.deltaTime;
+            nitroBar.SetValue(curNitro / maxNitro);
         }
         else 
         {

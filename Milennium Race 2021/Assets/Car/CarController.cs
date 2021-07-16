@@ -5,6 +5,7 @@ using UnityEngine;
 public class CarController : MonoBehaviour
 {
     private Rigidbody2D rb;
+    private SpriteRenderer sr;
 
     [SerializeField] private float maxAcceleration = 4;
     [SerializeField] [Range(0, 55f)]  private float maxSteering = 35;
@@ -18,6 +19,7 @@ public class CarController : MonoBehaviour
     public GameObject[] wheels;
     public GameObject[] driveWheels;
     public GameObject[] steeringWheels;
+    public GameObject[] lights;
 
     private float carAcceleration = 0f;
     private float carSteering = 0f;
@@ -30,9 +32,13 @@ public class CarController : MonoBehaviour
     private bool isBraking = false;
     private bool isNitro = false;
 
+    private bool lightTrail = false;
+    private bool wheelTrail = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
         rb.centerOfMass = new Vector2(0, normalCenterOfMass);
         curNitro = maxNitro;
     }
@@ -45,6 +51,10 @@ public class CarController : MonoBehaviour
 
     void UpdateAcceleration(float vertical)
     {
+        if (vertical < 0)
+        {
+            vertical *= 0.5f;
+        }
         carAcceleration = vertical * maxAcceleration * (isNitro ? 1.5f : 1f);
     }
 
@@ -80,17 +90,19 @@ public class CarController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
+            //sr.color = Color.green;
             isDrifting = true;
             isBraking = true;
-            rb.centerOfMass = new Vector2(0, brakeCenterOfMass);
+            //rb.centerOfMass = new Vector2(0, brakeCenterOfMass);
         }
-        else if (Mathf.Abs(Vector3.Angle(rb.velocity, transform.up)) < 10)
+        else if (isDrifting && Mathf.Abs(Vector3.Angle(rb.velocity, transform.up)) < 10)
         {
+            //sr.color = Color.red;
             isBraking = false;
             isDrifting = false;
-            rb.centerOfMass = new Vector2(0, normalCenterOfMass);
+            //rb.centerOfMass = new Vector2(0, normalCenterOfMass);
         }
-        else 
+        else
         {
             isBraking = false; 
         }
@@ -109,17 +121,47 @@ public class CarController : MonoBehaviour
     {
         if (Mathf.Abs(Vector3.Angle(rb.velocity, transform.up)) > 10 || isDrifting)
         {
-            foreach (var wheel in driveWheels)
+            if(!wheelTrail)
             {
-                wheel.GetComponent<TrailRenderer>().emitting = true;
+                foreach (var wheel in driveWheels)
+                {
+                    wheel.GetComponent<TrailRenderer>().emitting = true;
+                }
             }
+            wheelTrail = true;
         }
         else
         {
-            foreach (var wheel in driveWheels)
+            if (!wheelTrail)
             {
-                wheel.GetComponent<TrailRenderer>().emitting = false;
+                foreach (var wheel in driveWheels)
+                {
+                    wheel.GetComponent<TrailRenderer>().emitting = false;
+                }
             }
+            wheelTrail = false;
+        }
+        if (isNitro && Vector2.Dot(rb.velocity, (Vector2)transform.up) > 0)
+        {
+            if (!lightTrail)
+            {
+                foreach (var light in lights)
+                {
+                    light.GetComponent<TrailRenderer>().emitting = true;
+                }
+            }
+            lightTrail = true;
+        }
+        else
+        {
+            if (lightTrail)
+            {
+                foreach (var light in lights)
+                {
+                    light.GetComponent<TrailRenderer>().emitting = false;
+                }
+            }
+            lightTrail = false;
         }
     }
 

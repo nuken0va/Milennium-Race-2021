@@ -23,13 +23,13 @@ public class WallGeneration : MonoBehaviour
         for (int i = 0; i < numberOfObjects; i++)
         {
             {
-                Transform o = (Transform)Instantiate(prefab, topNextPosition, Quaternion.identity);
+                Transform o = (Transform)Instantiate(prefab, topNextPosition, Quaternion.identity, transform);
                 objectQueue.Enqueue(o);
             }
             var bottomPosition = topNextPosition;
             bottomPosition.y *= -1;
             {
-                Transform o = (Transform)Instantiate(prefab, bottomPosition, Quaternion.identity);
+                Transform o = (Transform)Instantiate(prefab, bottomPosition, Quaternion.identity, transform);
                 objectQueue.Enqueue(o);
             }
             topNextPosition.x += prefab.localScale.x;

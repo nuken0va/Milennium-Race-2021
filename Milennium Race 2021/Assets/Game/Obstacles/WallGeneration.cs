@@ -16,6 +16,7 @@ public class WallGeneration : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        player = GameObject.FindGameObjectsWithTag("Player")[0];
         topNextPosition = topStartPosition;
         recycleOffset = prefab.localScale.x * 2.5f;
         objectQueue = new Queue<Transform>();

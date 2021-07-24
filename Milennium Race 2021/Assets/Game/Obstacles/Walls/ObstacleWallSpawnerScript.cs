@@ -13,7 +13,7 @@ public class ObstacleWallSpawnerScript : MonoBehaviour
     private float nextPositionX;
     private Queue<Transform> objectQueue;
 
-    public GameObject player;
+    private GameObject player;
 
     void spawnWall()
     {
@@ -32,6 +32,7 @@ public class ObstacleWallSpawnerScript : MonoBehaviour
 
     void Start()
     {
+        player = GameObject.FindGameObjectsWithTag("Player")[0];
         nextPositionX = startPositionX;
 
         objectQueue = new Queue<Transform>();

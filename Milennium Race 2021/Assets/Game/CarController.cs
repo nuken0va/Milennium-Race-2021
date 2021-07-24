@@ -5,9 +5,8 @@ using UnityEngine;
 public class CarController : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private SpriteRenderer sr;
 
-    public NitroBar nitroBar;
+    private Bar nitroBar;
 
     [SerializeField] private float maxAcceleration = 4;
     [SerializeField] [Range(0, 55f)]  private float maxSteering = 35;
@@ -37,12 +36,14 @@ public class CarController : MonoBehaviour
     private bool lightTrail = false;
     private bool wheelTrail = false;
 
+    
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
         rb.centerOfMass = new Vector2(0, normalCenterOfMass);
         curNitro = maxNitro;
+        nitroBar = GameObject.Find("NitroBar").GetComponent<Bar>();
     }
 
     void AddForceAtPosition(Vector3 force, Vector3 pos)
@@ -106,10 +107,11 @@ public class CarController : MonoBehaviour
         UpdateTrails();
     }
 
-    void addFriction(GameObject wheel, Vector3 dir, float coefficient = 1.0f)
+    void addFriction(GameObject wheel, Vector3 dir)
     {
         var velocity = rb.GetPointVelocity(wheel.transform.position);
-        var friction = - frictionCefficient * rb.mass * Vector2.Dot(velocity, dir) * dir.normalized * coefficient;
+        //var friction = - rb.mass * frictionCefficient * Mathf.Sign(Vector2.Dot(velocity, dir)) * dir.normalized;
+        var friction = - rb.mass * frictionCefficient * Vector2.Dot(velocity, dir) * dir.normalized;
         AddForceAtPosition(friction, wheel.transform.position);
     }
 
@@ -176,7 +178,7 @@ public class CarController : MonoBehaviour
             }
             else
             {
-                addFriction(wheel, wheel.transform.up, 0.05f);
+                addFriction(wheel, wheel.transform.up);
             }
             
         }

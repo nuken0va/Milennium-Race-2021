@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NitroBar : MonoBehaviour
+public class Bar : MonoBehaviour
 {
     Slider slider;
     // Start is called before the first frame update

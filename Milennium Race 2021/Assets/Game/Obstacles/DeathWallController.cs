@@ -10,12 +10,13 @@ public class DeathWallController : MonoBehaviour
     public float acceleration = 0.001f;
     public float maxSpeed = 30f;
 
-    public GameObject player;
+    private GameObject player;
 
     private Rigidbody2D rb;
     // Start is called before the first frame update
     void Start()
     {
+        player = GameObject.FindGameObjectsWithTag("Player")[0];
         rb = GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(startSpeed,0);
         currentSpeed = startSpeed;
@@ -39,7 +40,7 @@ public class DeathWallController : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            GameObject.Find("GameManager").GetComponent<GameManager>().EndGame();
         }
     }
 }

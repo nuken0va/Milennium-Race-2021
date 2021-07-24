@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class UIScript : MonoBehaviour
+public class ScoreScript : MonoBehaviour
 {
+    public string prefix = "";
     GameObject player;
     Text text;
     int score;
@@ -13,7 +14,7 @@ public class UIScript : MonoBehaviour
         player = GameObject.FindGameObjectsWithTag("Player")[0];
         text = GetComponent<Text>();
         score = 0;
-        text.text = score.ToString();
+        text.text = prefix + score.ToString();
     }
 
     // Update is called once per frame
@@ -23,7 +24,7 @@ public class UIScript : MonoBehaviour
         if (score < curScore)
         {
             score = curScore;
-            text.text = score.ToString();
+            text.text = prefix + score.ToString();
         }
     }
 }

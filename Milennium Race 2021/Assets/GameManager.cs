@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,6 +12,8 @@ public class GameManager : MonoBehaviour
     public GameObject AliveHUD;
     public GameObject DeathHUD;
     public List<GameObject> PlayerPrefabs;
+
+    private DateTime startTime;
 
     public void Awake()
     {
@@ -25,11 +28,13 @@ public class GameManager : MonoBehaviour
         }
         player = Instantiate(selectedCar, new Vector3(0, 0, 0), Quaternion.Euler(0,0,-90));
         GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow = player.transform;
+        startTime = DateTime.Now;
     }
 
-    public void EndGame()
+    public void EndGame(int deathType = -1)
     {
         player.GetComponent<CarController>().enabled = false;
+        player.GetComponent<AudioSource>().enabled = false;
         player.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         wall.GetComponent<DeathWallController>().enabled = false;
         wall.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
@@ -43,6 +48,11 @@ public class GameManager : MonoBehaviour
         }
         AliveHUD.SetActive(false);
         DeathHUD.SetActive(true);
+       
+        var score = (int)((player.transform.position.x + 30) / 60);
+        var carId = GameInfo.selectedCar;
+        var time  = (float)(DateTime.Now - startTime).TotalSeconds;
+        GameInfo.AddScore(score, carId, time, deathType);
     }
 
     void Update()

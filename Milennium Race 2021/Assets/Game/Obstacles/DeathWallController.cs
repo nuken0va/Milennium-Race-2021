@@ -28,7 +28,7 @@ public class DeathWallController : MonoBehaviour
         rb.velocity = new Vector2(currentSpeed, 0);
         if (currentSpeed < maxSpeed)
         {
-            currentSpeed += acceleration;
+            currentSpeed += acceleration * Time.fixedDeltaTime;
         }
         if (player.transform.position.x - 200f > transform.position.x)
         {

@@ -5,6 +5,7 @@ using UnityEngine;
 public class CarController : MonoBehaviour
 {
     private Rigidbody2D rb;
+    private AudioSource aus;
 
     private Bar nitroBar;
 
@@ -29,6 +30,8 @@ public class CarController : MonoBehaviour
     float curNitro;
     public float maxNitro = 10.0f;
 
+    float currentVolume = 0f;
+
     private bool isDrifting = false;
     private bool isBraking = false;
     private bool isNitro = false;
@@ -41,6 +44,7 @@ public class CarController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        aus = GetComponent<AudioSource>();
         rb.centerOfMass = new Vector2(0, normalCenterOfMass);
         curNitro = maxNitro;
         nitroBar = GameObject.Find("NitroBar").GetComponent<Bar>();
@@ -73,10 +77,12 @@ public class CarController : MonoBehaviour
             isNitro = true;
             curNitro -= Time.deltaTime;
             nitroBar.SetValue(curNitro / maxNitro);
+            aus.pitch = 1.2f;
         }
         else 
         {
             isNitro = false;
+            aus.pitch = 1f;
         }
 
         var v = Input.GetAxis("Vertical");
@@ -102,6 +108,15 @@ public class CarController : MonoBehaviour
         else
         {
             isBraking = false; 
+        }
+
+        if (v == 0)
+        {
+            aus.volume = Mathf.MoveTowards(aus.volume, 0, 0.03f);
+        }
+        if (v != 0)
+        {
+            aus.volume = Mathf.MoveTowards(aus.volume, 1, 0.03f);
         }
 
         UpdateTrails();
